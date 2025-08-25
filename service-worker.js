@@ -1,4 +1,4 @@
-const CACHE='srn-pwa-v5'; // bump for mobile redirect change
+const CACHE='srn-pwa-v6'; // revert to simple index; force refresh
 const APP_SHELL=[
 	'./',
 	'./index.html',

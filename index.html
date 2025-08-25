@@ -10,45 +10,16 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <style>
     body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3}
-    header{padding:14px;background:#131a21;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-    header .variant{font-size:12px;padding:4px 8px;border:1px solid #2b6fb3;border-radius:6px;background:#0b1622;color:#4ea1ff}
+    header{padding:14px;background:#131a21;color:#fff}
     iframe{border:0;width:100%;height:calc(100vh - 60px)}
   </style>
 </head>
 <body>
-  <header><h1 style="margin:0">SRN Parts Lookup – FLS→Nemaska</h1><span class="variant" id="variantTag">detecting…</span></header>
-  <div id="desktopWrapper" style="display:none"><iframe id="appFrame" title="SRN Parts App" loading="eager"></iframe></div>
+  <header><h1>SRN Parts Lookup – FLS→Nemaska</h1></header>
+  <iframe src="SRN_Parts_Database_Improved.html" title="SRN Parts App"></iframe>
   <script>
     // Decide which version (desktop vs mobile) to load
-    (function(){
-      const VERSION='5'; // bump when changing detection to force reload
-      const qp=new URLSearchParams(location.search);
-      const force= location.hash.match(/force(Mobile|Desktop)/i)?.[1]?.toLowerCase() || qp.get('force');
-      function isMobileDevice(){
-        if(force==='mobile') return true;
-        if(force==='desktop') return false;
-        const ua = navigator.userAgent;
-        if(/iPhone|iPad|iPod|Android|Mobile|Mobi/i.test(ua)) return true;
-        if(navigator.maxTouchPoints>1 && (Math.min(screen.width,screen.height) <= 1024)) return true;
-        return false;
-      }
-      const mobile = isMobileDevice();
-      const variantTag=document.getElementById('variantTag');
-      if(mobile){
-        variantTag.textContent = (force? 'mobile-forced':'mobile') + ' v'+VERSION;
-        console.log('[SRN] Redirecting to mobile full page');
-        // redirect instead of iframe to avoid iframe sizing quirks on iOS
-        window.location.replace('SRN_Parts_Mobile_Full.html?v='+VERSION+ (force? '&force='+force:''));
-        return; // stop desktop embedding
-      }
-      // Desktop path: show iframe
-      const frame = document.getElementById('appFrame');
-      document.getElementById('desktopWrapper').style.display='block';
-      frame.src = 'SRN_Parts_Database_Improved.html?v='+VERSION;
-      frame.dataset.variant='desktop'+(force?'-forced':'');
-      variantTag.textContent = frame.dataset.variant + ' v'+VERSION;
-      if(location.hash === '#debugVariant') alert('Variant: '+frame.dataset.variant+' UA:'+navigator.userAgent);
-    })();
+  // Simple version (mobile will see desktop UI; can pinch/zoom). Keeping stable.
 
     // Register service worker
     if('serviceWorker' in navigator){
