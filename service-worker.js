@@ -1,4 +1,4 @@
-const CACHE='srn-shell-v11'; // bump after password gate & layout revert
+const CACHE='srn-shell-v12'; // bump after index.html password overlay
 const APP_SHELL=[
 	'./',
 	'./index.html',
