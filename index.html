@@ -18,11 +18,15 @@
 </head>
 <body>
   <header><h1>SRN Parts Lookup – Full Database</h1></header>
-  <iframe src="SRN_Parts_Database_Improved.html" title="SRN Parts Database"></iframe>
+  <iframe src="SRN_Parts_Database_Improved.html?v=17" title="SRN Parts Database"></iframe>
   <script>
+    // Remove any leftover password overlay from old cache
+    const old=document.getElementById('lockOverlay'); if(old) old.remove(); sessionStorage.removeItem('srnAuth');
     if('serviceWorker' in navigator){
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js', {scope: './'}).catch(console.error);
+        navigator.serviceWorker.register('./service-worker.js', {scope: './'}).then(reg=>{
+          if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});} // immediate claim if updated
+        }).catch(console.error);
       });
     }
   </script>
