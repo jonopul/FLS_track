@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SRN Parts Lookup – FLS→Nemaska (PWA)</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b0f14" />
+  <link rel="icon" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <style>
+    body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3}
+    header{padding:14px;background:#131a21;color:#fff}
+    iframe{border:0;width:100%;height:calc(100vh - 60px)}
+  </style>
+</head>
+<body>
+  <header><h1>SRN Parts Lookup – FLS→Nemaska</h1></header>
+  <iframe src="SRN_Parts_Database_Improved.html" title="SRN Parts App"></iframe>
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js', {scope: './'}).catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
