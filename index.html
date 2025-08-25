@@ -17,11 +17,11 @@
 </head>
 <body>
   <header><h1 style="margin:0">SRN Parts Lookup – FLS→Nemaska</h1><span class="variant" id="variantTag">detecting…</span></header>
-  <iframe id="appFrame" title="SRN Parts App" loading="eager"></iframe>
+  <div id="desktopWrapper" style="display:none"><iframe id="appFrame" title="SRN Parts App" loading="eager"></iframe></div>
   <script>
     // Decide which version (desktop vs mobile) to load
     (function(){
-      const VERSION='4'; // bump when changing detection to force reload
+      const VERSION='5'; // bump when changing detection to force reload
       const qp=new URLSearchParams(location.search);
       const force= location.hash.match(/force(Mobile|Desktop)/i)?.[1]?.toLowerCase() || qp.get('force');
       function isMobileDevice(){
@@ -33,17 +33,21 @@
         return false;
       }
       const mobile = isMobileDevice();
-      const file = mobile ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
-      const frame = document.getElementById('appFrame');
-      frame.src = file + '?v=' + VERSION;
       const variantTag=document.getElementById('variantTag');
-      frame.dataset.variant = mobile ? 'mobile' : 'desktop';
-      if(force) frame.dataset.variant += '-forced';
-      variantTag.textContent = frame.dataset.variant + ' v'+VERSION;
-      console.log('[SRN] variant', frame.dataset.variant, '->', frame.src);
-      if(location.hash === '#debugVariant'){
-        alert('Variant: '+frame.dataset.variant+'\nUserAgent: '+navigator.userAgent); // simple debug
+      if(mobile){
+        variantTag.textContent = (force? 'mobile-forced':'mobile') + ' v'+VERSION;
+        console.log('[SRN] Redirecting to mobile full page');
+        // redirect instead of iframe to avoid iframe sizing quirks on iOS
+        window.location.replace('SRN_Parts_Mobile_Full.html?v='+VERSION+ (force? '&force='+force:''));
+        return; // stop desktop embedding
       }
+      // Desktop path: show iframe
+      const frame = document.getElementById('appFrame');
+      document.getElementById('desktopWrapper').style.display='block';
+      frame.src = 'SRN_Parts_Database_Improved.html?v='+VERSION;
+      frame.dataset.variant='desktop'+(force?'-forced':'');
+      variantTag.textContent = frame.dataset.variant + ' v'+VERSION;
+      if(location.hash === '#debugVariant') alert('Variant: '+frame.dataset.variant+' UA:'+navigator.userAgent);
     })();
 
     // Register service worker
