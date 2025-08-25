@@ -3,46 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SRN Parts Lookup – FLS→Nemaska</title>
+  <title>SRN Parts Lookup – FLS→Nemaska (PWA)</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b0f14">
+  <meta name="theme-color" content="#0b0f14" />
   <link rel="icon" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <style>body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3;padding:16px;font-family:system-ui,Segoe UI,Arial,sans-serif}h1{margin:0 0 12px;font-size:20px;color:#4ea1ff}input[type=file]{margin:12px 0}table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}th,td{border:1px solid #233142;padding:6px 8px;vertical-align:top}th{background:#131a21;position:sticky;top:0}#status{margin-top:8px;font-size:12px;color:#9fb0c0} @media (max-width:680px){h1{font-size:18px}table{font-size:11px}}</style>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <style>
+    body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3}
+    header{padding:12px 16px;background:#131a21;color:#fff}
+    header h1{margin:0;font-size:18px}
+    iframe{border:0;width:100%;height:calc(100vh - 56px)}
+    @media (max-width:760px){header h1{font-size:16px}}
+  </style>
 </head>
 <body>
-  <h1>SRN Parts Lookup</h1>
-  <p style="margin:0 0 10px">Load Excel files (won't leave device). First 10 rows per sheet previewed.</p>
-  <input id="fileInput" type="file" accept=".xls,.xlsx" multiple>
-  <div id="status">No files loaded.</div>
-  <table><thead><tr><th>File</th><th>Sheet</th><th>Row (first 10)</th></tr></thead><tbody id="tbody"></tbody></table>
+  <header><h1>SRN Parts Lookup – Full Database</h1></header>
+  <iframe src="SRN_Parts_Database_Improved.html" title="SRN Parts Database"></iframe>
   <script>
-  const tbody=document.getElementById('tbody');
-  const status=document.getElementById('status');
-  async function parseWorkbook(file){
-    try{
-      const data=await file.arrayBuffer();
-      const wb=XLSX.read(data,{type:'array'});
-      for(const s of wb.SheetNames){
-        const ws=wb.Sheets[s];
-        const json=XLSX.utils.sheet_to_json(ws,{defval:""});
-        json.slice(0,10).forEach(row=>{
-          const tr=document.createElement('tr');
-            tr.innerHTML=`<td>${file.name}</td><td>${s}</td><td>${Object.values(row).join(' | ')}</td>`;
-          tbody.appendChild(tr);
-        });
-      }
-    }catch(err){console.error(err);}
-  }
-  document.getElementById('fileInput').addEventListener('change',e=>{
-    tbody.innerHTML='';
-    const files=[...e.target.files];
-    if(!files.length){status.textContent='No files selected.';return;}
-    status.textContent='Parsing '+files.length+' file(s)...';
-    Promise.all(files.map(parseWorkbook)).then(()=>status.textContent='Done.');
-  });
-  if('serviceWorker' in navigator){navigator.serviceWorker.register('./service-worker.js');}
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js', {scope: './'}).catch(console.error);
+      });
+    }
   </script>
+  <noscript>Enable JavaScript to use the SRN Parts database.</noscript>
 </body>
 </html>

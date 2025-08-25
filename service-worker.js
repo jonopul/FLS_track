@@ -1,8 +1,9 @@
-const CACHE='srn-shell-v9'; // simplified single-page shell
+const CACHE='srn-shell-v10'; // revert to full database iframe shell
 const APP_SHELL=[
 	'./',
 	'./index.html',
 	'./manifest.json',
+	'./SRN_Parts_Database_Improved.html',
 	'./icons/icon-192.png',
 	'./icons/icon-512.png'
 ];
