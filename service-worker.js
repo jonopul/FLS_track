@@ -1,4 +1,4 @@
-const CACHE='srn-shell-v13'; // bump after improved unlock compatibility
+const CACHE='srn-shell-v14'; // bump after auth simplification
 const APP_SHELL=[
 	'./',
 	'./index.html',

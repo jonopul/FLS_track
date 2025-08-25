@@ -64,15 +64,11 @@
         if(val===PASS){unlockFlow();}
         else {msg.textContent='Incorrect code';}
       }
-      // First try prompt (lighter path / compatibility)
+      // Show overlay unless already unlocked this session
       if(sessionStorage.getItem('srnAuth')==='1'){
         loadApp();
       } else {
-        const p=prompt('Enter access code');
-        if(p===PASS){unlockFlow();}
-        else {
-          overlay.hidden=false; // show overlay fallback
-        }
+        overlay.hidden=false;
       }
       btn.addEventListener('click',attempt,{passive:true});
       btn.addEventListener('touchstart',attempt,{passive:true});
