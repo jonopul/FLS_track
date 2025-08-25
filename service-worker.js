@@ -1,4 +1,4 @@
-const CACHE='srn-shell-v10'; // revert to full database iframe shell
+const CACHE='srn-shell-v11'; // bump after password gate & layout revert
 const APP_SHELL=[
 	'./',
 	'./index.html',
