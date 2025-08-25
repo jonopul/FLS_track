@@ -35,6 +35,22 @@
     .stat{background:var(--bg);padding:12px;border-radius:8px;text-align:center}
     .stat-number{font-size:24px;font-weight:700;color:var(--accent)}
     .stat-label{font-size:11px;color:var(--muted)}
+    /* Responsive additions */
+  #toggleColsBtn{display:none}
+    @media (max-width:900px){header h1{font-size:18px}}
+    @media (max-width:760px){
+      header h1{font-size:16px;flex:1 0 100%}
+      .wrap{padding:14px}
+      .pill{display:none}
+      .controls .row{grid-template-columns:repeat(2,1fr)}
+      .controls .row > div[style]{grid-column:span 2 !important}
+      table{font-size:12px}
+      thead th{padding:6px 8px}
+      tbody td{padding:6px 8px;max-width:140px}
+      #toggleColsBtn{display:inline-block;margin-left:auto}
+      .hide-mobile{display:none}
+      body.show-all .hide-mobile{display:table-cell}
+    }
   </style>
 </head>
 <body>
@@ -116,7 +132,10 @@
           <span class="tag" id="recordsTag">Records: 0</span>
           <span class="tag" id="sheetsTag">Sheets: 0</span>
         </div>
-        <div class="hint">Enhanced pattern matching for better results</div>
+        <div class="flex" style="gap:8px;align-items:center">
+          <button id="toggleColsBtn" class="primary" style="background:#2b3948;border-color:#355066">More Columns</button>
+          <div class="hint">Enhanced pattern matching for better results</div>
+        </div>
       </div>
       
       <table id="tbl">
@@ -125,17 +144,17 @@
             <th>File</th>
             <th>Sheet</th>
             <th>MPL No.</th>
-            <th>PL Address</th>
-            <th>Main Parts List</th>
+            <th class="hide-mobile">PL Address</th>
+            <th class="hide-mobile">Main Parts List</th>
             <th>FLS Equipment</th>
             <th>Customer Equip.</th>
             <th>Description</th>
             <th>Qty</th>
             <th>UoM</th>
-            <th>CU ID</th>
-            <th>Line No.</th>
-            <th>Drawing No.</th>
-            <th>Case No.</th>
+            <th class="hide-mobile">CU ID</th>
+            <th class="hide-mobile">Line No.</th>
+            <th class="hide-mobile">Drawing No.</th>
+            <th class="hide-mobile">Case No.</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -362,6 +381,14 @@
   console.log(`Record 01.01.03.12 in database: ${hasTarget}`);
   
   console.log(`Improved SRN Parts Database initialized with ${state.records.length.toLocaleString()} records`);
+  // Column toggle for mobile
+  const toggleBtn = document.getElementById('toggleColsBtn');
+  if(toggleBtn){
+    toggleBtn.addEventListener('click', ()=>{
+      const expanded = document.body.classList.toggle('show-all');
+      toggleBtn.textContent = expanded ? 'Fewer Columns' : 'More Columns';
+    });
+  }
 })();
 </script>
 </body>
