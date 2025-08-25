@@ -1,4 +1,4 @@
-const CACHE='srn-pwa-v3'; // bumped to include mobile variant
+const CACHE='srn-pwa-v4'; // bumped for improved mobile detection + cache bust
 const APP_SHELL=[
 	'./',
 	'./index.html',

@@ -10,25 +10,40 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <style>
     body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3}
-    header{padding:14px;background:#131a21;color:#fff}
+    header{padding:14px;background:#131a21;color:#fff;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    header .variant{font-size:12px;padding:4px 8px;border:1px solid #2b6fb3;border-radius:6px;background:#0b1622;color:#4ea1ff}
     iframe{border:0;width:100%;height:calc(100vh - 60px)}
   </style>
 </head>
 <body>
-  <header><h1>SRN Parts Lookup – FLS→Nemaska</h1></header>
+  <header><h1 style="margin:0">SRN Parts Lookup – FLS→Nemaska</h1><span class="variant" id="variantTag">detecting…</span></header>
   <iframe id="appFrame" title="SRN Parts App" loading="eager"></iframe>
   <script>
     // Decide which version (desktop vs mobile) to load
     (function(){
-      const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.innerWidth <= 820 && navigator.maxTouchPoints > 0);
-      const target = isMobile ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
+      const VERSION='4'; // bump when changing detection to force reload
+      const qp=new URLSearchParams(location.search);
+      const force= location.hash.match(/force(Mobile|Desktop)/i)?.[1]?.toLowerCase() || qp.get('force');
+      function isMobileDevice(){
+        if(force==='mobile') return true;
+        if(force==='desktop') return false;
+        const ua = navigator.userAgent;
+        if(/iPhone|iPad|iPod|Android|Mobile|Mobi/i.test(ua)) return true;
+        if(navigator.maxTouchPoints>1 && (Math.min(screen.width,screen.height) <= 1024)) return true;
+        return false;
+      }
+      const mobile = isMobileDevice();
+      const file = mobile ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
       const frame = document.getElementById('appFrame');
-      frame.src = target;
-      frame.setAttribute('data-variant', isMobile ? 'mobile' : 'desktop');
-      console.log('[SRN] Loaded', target, 'variant=', frame.dataset.variant);
-      // Optional: allow hash toggle #forceDesktop or #forceMobile
-      if(location.hash === '#forceDesktop'){ frame.src = 'SRN_Parts_Database_Improved.html'; frame.dataset.variant='desktop-forced'; }
-      if(location.hash === '#forceMobile'){ frame.src = 'SRN_Parts_Mobile_Full.html'; frame.dataset.variant='mobile-forced'; }
+      frame.src = file + '?v=' + VERSION;
+      const variantTag=document.getElementById('variantTag');
+      frame.dataset.variant = mobile ? 'mobile' : 'desktop';
+      if(force) frame.dataset.variant += '-forced';
+      variantTag.textContent = frame.dataset.variant + ' v'+VERSION;
+      console.log('[SRN] variant', frame.dataset.variant, '->', frame.src);
+      if(location.hash === '#debugVariant'){
+        alert('Variant: '+frame.dataset.variant+'\nUserAgent: '+navigator.userAgent); // simple debug
+      }
     })();
 
     // Register service worker
