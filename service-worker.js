@@ -1,4 +1,4 @@
-const CACHE='srn-pwa-v6'; // revert to simple index; force refresh
+const CACHE='srn-pwa-v7'; // bump for simple iframe mobile auto-switch
 const APP_SHELL=[
 	'./',
 	'./index.html',

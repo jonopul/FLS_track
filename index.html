@@ -15,11 +15,20 @@
   </style>
 </head>
 <body>
-  <header><h1>SRN Parts Lookup – FLS→Nemaska</h1></header>
-  <iframe src="SRN_Parts_Database_Improved.html" title="SRN Parts App"></iframe>
+  <header><h1 style="margin:0">SRN Parts Lookup – FLS→Nemaska</h1></header>
+  <iframe id="appFrame" title="SRN Parts App" loading="eager"></iframe>
   <script>
-    // Decide which version (desktop vs mobile) to load
-  // Simple version (mobile will see desktop UI; can pinch/zoom). Keeping stable.
+    // Minimal mobile detection: choose which HTML file to load into iframe
+    (function(){
+      var frame = document.getElementById('appFrame');
+      var ua = navigator.userAgent;
+      var isMobile = /iPhone|iPad|iPod|Android|Mobile|Mobi/i.test(ua) || (window.innerWidth <= 780 && navigator.maxTouchPoints>0);
+      // Allow manual override via hash: #desktop or #mobile
+      if(location.hash === '#desktop') isMobile = false;
+      if(location.hash === '#mobile') isMobile = true;
+      frame.src = isMobile ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
+      console.log('[SRN] Loaded variant:', isMobile ? 'mobile' : 'desktop');
+    })();
 
     // Register service worker
     if('serviceWorker' in navigator){
