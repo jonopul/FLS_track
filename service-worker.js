@@ -1,9 +1,10 @@
-const CACHE='srn-shell-v15'; // bump after removing password gate
+const CACHE='srn-shell-v16'; // bump after adding app.html direct entry
 const APP_SHELL=[
 	'./',
 	'./index.html',
 	'./manifest.json',
 	'./SRN_Parts_Database_Improved.html',
+	'./app.html',
 	'./icons/icon-192.png',
 	'./icons/icon-512.png'
 ];
