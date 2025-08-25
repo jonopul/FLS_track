@@ -43,29 +43,39 @@
       const inp=document.getElementById('lockInput');
       const btn=document.getElementById('lockBtn');
       const msg=document.getElementById('lockMsg');
+      let unlocked=false;
       function loadApp(){
+        if(unlocked) return;
         if(!mount.querySelector('iframe')){
           const fr=document.createElement('iframe');
           fr.title='SRN Parts Database';
           fr.src='SRN_Parts_Database_Improved.html';
           mount.appendChild(fr);
         }
+        unlocked=true;
       }
       function unlockFlow(){
-        overlay.hidden=true;loadApp();
         sessionStorage.setItem('srnAuth','1');
+        overlay.hidden=true;
+        loadApp();
       }
+      function attempt(){
+        const val=inp.value.trim();
+        if(val===PASS){unlockFlow();}
+        else {msg.textContent='Incorrect code';}
+      }
+      // First try prompt (lighter path / compatibility)
       if(sessionStorage.getItem('srnAuth')==='1'){
         loadApp();
       } else {
-        overlay.hidden=false;
-        setTimeout(()=>inp.focus(),50);
+        const p=prompt('Enter access code');
+        if(p===PASS){unlockFlow();}
+        else {
+          overlay.hidden=false; // show overlay fallback
+        }
       }
-      function attempt(){
-        if(inp.value.trim()===PASS){unlockFlow();}
-        else {msg.textContent='Incorrect code';inp.select();}
-      }
-      btn.addEventListener('click',attempt);
+      btn.addEventListener('click',attempt,{passive:true});
+      btn.addEventListener('touchstart',attempt,{passive:true});
       inp.addEventListener('keypress',e=>{if(e.key==='Enter')attempt();});
       if('serviceWorker' in navigator){
         window.addEventListener('load', () => {

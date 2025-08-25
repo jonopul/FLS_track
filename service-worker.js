@@ -1,4 +1,4 @@
-const CACHE='srn-shell-v12'; // bump after index.html password overlay
+const CACHE='srn-shell-v13'; // bump after improved unlock compatibility
 const APP_SHELL=[
 	'./',
 	'./index.html',
