@@ -1,4 +1,4 @@
-const CACHE='srn-shell-v14'; // bump after auth simplification
+const CACHE='srn-shell-v15'; // bump after removing password gate
 const APP_SHELL=[
 	'./',
 	'./index.html',
