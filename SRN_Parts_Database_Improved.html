@@ -35,6 +35,23 @@
     .stat{background:var(--bg);padding:12px;border-radius:8px;text-align:center}
     .stat-number{font-size:24px;font-weight:700;color:var(--accent)}
     .stat-label{font-size:11px;color:var(--muted)}
+    /* Mobile card layout */
+    .view-switch{margin-left:auto;}
+    #cards{display:none}
+    .cards-grid{display:grid;grid-template-columns:1fr;gap:12px;margin:0 0 24px}
+    .card-item{background:var(--card);border:1px solid var(--grid);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+    .card-line{font-size:12px;color:var(--muted)}
+    .card-tags{display:flex;flex-wrap:wrap;gap:6px;font-size:11px}
+    .card-tags span{background:#0f141a;border:1px solid var(--grid);padding:2px 6px;border-radius:6px}
+    .card-head{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline}
+    .card-mpl{font-weight:600;color:var(--accent);font-size:14px}
+    .card-desc{font-size:13px;line-height:1.3}
+    @media (max-width:760px){
+      body.cards-mode table{display:none}
+      body.cards-mode #cards{display:block}
+      #toggleLayoutBtn{display:inline-block}
+    }
+    #toggleLayoutBtn{display:none;margin-left:auto;background:#2b3948;border:1px solid #355066;color:var(--fg);padding:6px 10px;border-radius:8px;cursor:pointer;font-size:12px}
     /* Responsive additions */
   #toggleColsBtn{display:none}
     @media (max-width:900px){header h1{font-size:18px}}
@@ -133,11 +150,15 @@
           <span class="tag" id="sheetsTag">Sheets: 0</span>
         </div>
         <div class="flex" style="gap:8px;align-items:center">
+          <button id="toggleLayoutBtn" title="Switch table/cards">Cards</button>
           <button id="toggleColsBtn" class="primary" style="background:#2b3948;border-color:#355066">More Columns</button>
           <div class="hint">Enhanced pattern matching for better results</div>
         </div>
       </div>
       
+      <div id="cards">
+        <div class="cards-grid" id="cardsGrid"></div>
+      </div>
       <table id="tbl">
         <thead>
           <tr>
@@ -241,8 +262,10 @@
       fragment.appendChild(tr);
     });
     
-    tbody.appendChild(fragment);
-    el('exportBtn').disabled = false;
+  tbody.appendChild(fragment);
+  el('exportBtn').disabled = false;
+  // Rebuild cards if in card mode
+  if(document.body.classList.contains('cards-mode')) buildCards(displayRecords, queries);
     
     const summary = records.length === 0 ? 
       'No matches found.' :
@@ -366,6 +389,33 @@
   el('showAllBtn').addEventListener('click', showAllRecords);
   el('exportBtn').addEventListener('click', exportToCsv);
   el('testBtn').addEventListener('click', testSpecificRecord);
+  const toggleLayoutBtn = document.getElementById('toggleLayoutBtn');
+  function buildCards(records, queries){
+    const grid = document.getElementById('cardsGrid');
+    if(!grid) return;
+    grid.innerHTML='';
+    const frag=document.createDocumentFragment();
+    records.forEach(r=>{
+      const wrap=document.createElement('div');
+      wrap.className='card-item';
+      function h(txt){
+        let content=txt||'';queries.forEach(q=>{if(q) content=highlight(content,q);});
+        return content;
+      }
+      wrap.innerHTML=`<div class="card-head"><div class="card-mpl">${h(r.MPL||r.FLS||r.CUST||'—')}</div><div class="card-line">${h(r.file||'')}</div></div>
+      <div class="card-desc">${h(r.DESC||'')}</div>
+      <div class="card-tags">${[r.FLS&&`<span>${h(r.FLS)}</span>`,r.CUST&&`<span>${h(r.CUST)}</span>`,r.QTY&&`<span>Qty: ${h(r.QTY)}</span>`,r.UOM&&`<span>${h(r.UOM)}</span>`].filter(Boolean).join('')}</div>`;
+      frag.appendChild(wrap);
+    });
+    grid.appendChild(frag);
+  }
+  if(toggleLayoutBtn){
+    toggleLayoutBtn.addEventListener('click',()=>{
+      const cards = document.body.classList.toggle('cards-mode');
+      toggleLayoutBtn.textContent = cards ? 'Table' : 'Cards';
+      if(cards){buildCards(state.displayRecords.slice(0,500), []);} else { /* table mode only */ }
+    });
+  }
   
   ['q_mpl', 'q_fls', 'q_customer', 'q_text'].forEach(id => {
     el(id).addEventListener('keypress', e => {
