@@ -1,10 +1,8 @@
-const CACHE='srn-pwa-v8'; // bump for toggle-based mobile/desktop switch
+const CACHE='srn-shell-v9'; // simplified single-page shell
 const APP_SHELL=[
 	'./',
 	'./index.html',
 	'./manifest.json',
-	'./SRN_Parts_Database_Improved.html',
-	'./SRN_Parts_Mobile_Full.html',
 	'./icons/icon-192.png',
 	'./icons/icon-512.png'
 ];

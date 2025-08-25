@@ -3,70 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SRN Parts Lookup – FLS→Nemaska (PWA)</title>
+  <title>SRN Parts Lookup – FLS→Nemaska</title>
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b0f14" />
+  <meta name="theme-color" content="#0b0f14">
   <link rel="icon" sizes="192x192" href="icons/icon-192.png">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <style>
-    body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3}
-    header{padding:10px 14px;background:#131a21;color:#fff;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-    h1{font-size:16px;margin:0;font-weight:600}
-    .viewToggle{display:flex;gap:6px;margin-left:auto}
-    .viewToggle button{background:#1d2730;color:#e6edf3;border:1px solid #2a3b4a;padding:6px 10px;border-radius:6px;cursor:pointer;font:12px system-ui}
-    .viewToggle button.active{background:#4ea1ff;color:#08131d;border-color:#2b6fb3;font-weight:600}
-    iframe{border:0;width:100%;height:calc(100vh - 52px)}
-    @media (max-width:780px){h1{flex:1 1 100%;}}
-  </style>
+  <style>body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3;padding:16px;font-family:system-ui,Segoe UI,Arial,sans-serif}h1{margin:0 0 12px;font-size:20px;color:#4ea1ff}input[type=file]{margin:12px 0}table{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}th,td{border:1px solid #233142;padding:6px 8px;vertical-align:top}th{background:#131a21;position:sticky;top:0}#status{margin-top:8px;font-size:12px;color:#9fb0c0} @media (max-width:680px){h1{font-size:18px}table{font-size:11px}}</style>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>SRN Parts Lookup – FLS→Nemaska</h1>
-    <div class="viewToggle" id="toggleBtns" hidden>
-      <button id="btnDesktop" type="button">Desktop</button>
-      <button id="btnMobile" type="button">Mobile</button>
-    </div>
-  </header>
-  <iframe id="appFrame" title="SRN Parts App" loading="eager" src="about:blank"></iframe>
+  <h1>SRN Parts Lookup</h1>
+  <p style="margin:0 0 10px">Load Excel files (won't leave device). First 10 rows per sheet previewed.</p>
+  <input id="fileInput" type="file" accept=".xls,.xlsx" multiple>
+  <div id="status">No files loaded.</div>
+  <table><thead><tr><th>File</th><th>Sheet</th><th>Row (first 10)</th></tr></thead><tbody id="tbody"></tbody></table>
   <script>
-    // Minimal mobile detection: choose which HTML file to load into iframe
-    (function(){
-      const frame = document.getElementById('appFrame');
-      const btnsWrap = document.getElementById('toggleBtns');
-      const btnDesktop = document.getElementById('btnDesktop');
-      const btnMobile = document.getElementById('btnMobile');
-      let current = null;
-      function load(kind){
-        if(current===kind) return;
-        current = kind;
-        frame.src = kind==='mobile' ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
-        btnDesktop.classList.toggle('active', kind==='desktop');
-        btnMobile.classList.toggle('active', kind==='mobile');
-        console.log('[SRN] view:', kind);
+  const tbody=document.getElementById('tbody');
+  const status=document.getElementById('status');
+  async function parseWorkbook(file){
+    try{
+      const data=await file.arrayBuffer();
+      const wb=XLSX.read(data,{type:'array'});
+      for(const s of wb.SheetNames){
+        const ws=wb.Sheets[s];
+        const json=XLSX.utils.sheet_to_json(ws,{defval:""});
+        json.slice(0,10).forEach(row=>{
+          const tr=document.createElement('tr');
+            tr.innerHTML=`<td>${file.name}</td><td>${s}</td><td>${Object.values(row).join(' | ')}</td>`;
+          tbody.appendChild(tr);
+        });
       }
-      btnDesktop.onclick = ()=>load('desktop');
-      btnMobile.onclick = ()=>load('mobile');
-      // Decide initial by width only (simple & reliable)
-      let initial = (window.innerWidth <= 780) ? 'mobile' : 'desktop';
-      if(location.hash==='#desktop') initial='desktop';
-      if(location.hash==='#mobile') initial='mobile';
-      load(initial);
-      // Show toggle once initial loaded so user can switch if they prefer
-      btnsWrap.hidden = false;
-      // Optional: respond to orientation change
-      window.addEventListener('orientationchange', () => {
-        // Offer switch suggestion but don't auto-switch to avoid confusion
-        console.log('[SRN] orientation changed');
-      });
-    })();
-
-    // Register service worker
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js', {scope: './'}).catch(console.error);
-      });
-    }
+    }catch(err){console.error(err);}
+  }
+  document.getElementById('fileInput').addEventListener('change',e=>{
+    tbody.innerHTML='';
+    const files=[...e.target.files];
+    if(!files.length){status.textContent='No files selected.';return;}
+    status.textContent='Parsing '+files.length+' file(s)...';
+    Promise.all(files.map(parseWorkbook)).then(()=>status.textContent='Done.');
+  });
+  if('serviceWorker' in navigator){navigator.serviceWorker.register('./service-worker.js');}
   </script>
-  <noscript>Your browser needs JavaScript enabled to load the SRN Parts application.</noscript>
 </body>
 </html>
