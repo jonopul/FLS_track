@@ -1,4 +1,4 @@
-const CACHE='srn-pwa-v7'; // bump for simple iframe mobile auto-switch
+const CACHE='srn-pwa-v8'; // bump for toggle-based mobile/desktop switch
 const APP_SHELL=[
 	'./',
 	'./index.html',

@@ -10,24 +10,54 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <style>
     body{margin:0;font:14px system-ui;background:#0b0f14;color:#e6edf3}
-    header{padding:14px;background:#131a21;color:#fff}
-    iframe{border:0;width:100%;height:calc(100vh - 60px)}
+    header{padding:10px 14px;background:#131a21;color:#fff;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+    h1{font-size:16px;margin:0;font-weight:600}
+    .viewToggle{display:flex;gap:6px;margin-left:auto}
+    .viewToggle button{background:#1d2730;color:#e6edf3;border:1px solid #2a3b4a;padding:6px 10px;border-radius:6px;cursor:pointer;font:12px system-ui}
+    .viewToggle button.active{background:#4ea1ff;color:#08131d;border-color:#2b6fb3;font-weight:600}
+    iframe{border:0;width:100%;height:calc(100vh - 52px)}
+    @media (max-width:780px){h1{flex:1 1 100%;}}
   </style>
 </head>
 <body>
-  <header><h1 style="margin:0">SRN Parts Lookup – FLS→Nemaska</h1></header>
-  <iframe id="appFrame" title="SRN Parts App" loading="eager"></iframe>
+  <header>
+    <h1>SRN Parts Lookup – FLS→Nemaska</h1>
+    <div class="viewToggle" id="toggleBtns" hidden>
+      <button id="btnDesktop" type="button">Desktop</button>
+      <button id="btnMobile" type="button">Mobile</button>
+    </div>
+  </header>
+  <iframe id="appFrame" title="SRN Parts App" loading="eager" src="about:blank"></iframe>
   <script>
     // Minimal mobile detection: choose which HTML file to load into iframe
     (function(){
-      var frame = document.getElementById('appFrame');
-      var ua = navigator.userAgent;
-      var isMobile = /iPhone|iPad|iPod|Android|Mobile|Mobi/i.test(ua) || (window.innerWidth <= 780 && navigator.maxTouchPoints>0);
-      // Allow manual override via hash: #desktop or #mobile
-      if(location.hash === '#desktop') isMobile = false;
-      if(location.hash === '#mobile') isMobile = true;
-      frame.src = isMobile ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
-      console.log('[SRN] Loaded variant:', isMobile ? 'mobile' : 'desktop');
+      const frame = document.getElementById('appFrame');
+      const btnsWrap = document.getElementById('toggleBtns');
+      const btnDesktop = document.getElementById('btnDesktop');
+      const btnMobile = document.getElementById('btnMobile');
+      let current = null;
+      function load(kind){
+        if(current===kind) return;
+        current = kind;
+        frame.src = kind==='mobile' ? 'SRN_Parts_Mobile_Full.html' : 'SRN_Parts_Database_Improved.html';
+        btnDesktop.classList.toggle('active', kind==='desktop');
+        btnMobile.classList.toggle('active', kind==='mobile');
+        console.log('[SRN] view:', kind);
+      }
+      btnDesktop.onclick = ()=>load('desktop');
+      btnMobile.onclick = ()=>load('mobile');
+      // Decide initial by width only (simple & reliable)
+      let initial = (window.innerWidth <= 780) ? 'mobile' : 'desktop';
+      if(location.hash==='#desktop') initial='desktop';
+      if(location.hash==='#mobile') initial='mobile';
+      load(initial);
+      // Show toggle once initial loaded so user can switch if they prefer
+      btnsWrap.hidden = false;
+      // Optional: respond to orientation change
+      window.addEventListener('orientationchange', () => {
+        // Offer switch suggestion but don't auto-switch to avoid confusion
+        console.log('[SRN] orientation changed');
+      });
     })();
 
     // Register service worker
